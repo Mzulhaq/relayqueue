@@ -17,7 +17,14 @@ Coverage includes the API, configuration, signatures, and storage/worker logic. 
 
 ## Cross-platform verification
 
-The GitHub workflow runs Python 3.11 and 3.13, PostgreSQL 17 integration tests, a built container's end-to-end demo, and Docker Compose startup/readiness. Docker is not installed on the development machine. Remote CI results will be recorded here after the first push; no remote success is claimed yet.
+[GitHub CI run 40905906621](https://github.com/Mzulhaq/relayqueue/actions/runs/40905906621) passed all four jobs for source commit `e0c2b0a735803378fbfcd4bbc0e165a56ab8e757`:
+
+- Python 3.11 with SQLite: checks, full test suite, HTTP demo and package build passed.
+- Python 3.13 with SQLite: the same checks passed.
+- Python 3.11 with PostgreSQL 17: the full suite passed, with the delivery/storage tests targeting PostgreSQL (API tests use isolated SQLite databases); demo and package build also passed.
+- Container: image build, in-container HTTP demo, Docker Compose startup, API readiness and worker access to PostgreSQL passed.
+
+Docker is not installed on the development machine; the container evidence comes from the GitHub-hosted Linux runner. See the repository's CI badge for subsequent runs.
 
 ## Guarantees and limits
 

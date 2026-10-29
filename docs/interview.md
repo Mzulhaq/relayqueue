@@ -40,7 +40,7 @@ Add an admin-only operation that schedules one `dead` event for another delivery
 
 Adapt these only after reviewing and exercising the project. Keep the wording accurate to the code and your own contribution; do not add impact or scale claims without evidence.
 
-- Built a Python webhook relay with HMAC-authenticated ingress, durable SQL-backed event storage, and an independently running delivery worker.
-- Implemented bounded retry handling and lease-token fencing for recovery, with SQLite/PostgreSQL support and a synthetic loopback demonstration.
+- Built a Python/FastAPI webhook relay with HMAC-authenticated ingress, SQL persistence, and duplicate protection; validated behavior with 72 automated tests and 90% statement coverage.
+- Implemented durable retries, dead-letter handling, and lease-token fencing; verified recovery with real HTTP fault scenarios and passing PostgreSQL, Python 3.11/3.13, and container CI checks.
 
 AI assistance contributed to this project. Be candid about which design, implementation, testing, and review work you personally performed, and be prepared to explain each component.

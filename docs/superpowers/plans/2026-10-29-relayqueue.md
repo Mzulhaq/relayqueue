@@ -1,6 +1,6 @@
 # RelayQueue Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Build, verify and publish the authorized webhook reliability portfolio project.
 
@@ -31,9 +31,9 @@ Files: `src/relayqueue/config.py`, `signing.py`, `api.py`, `tests/test_api.py`, 
 
 Interfaces: `Settings` frozen dataclass, `Settings.from_env()`; `sign(secret, event_id, timestamp, body) -> str`; `create_app(settings=None, database=None) -> FastAPI`.
 
-- [ ] Write failing tests for valid signed ingestion, tampering, stale timestamps, invalid schema/IDs, body limits, duplicate conflict, and admin auth.
-- [ ] Run tests and observe missing behavior; implement the smallest complete API against the storage contract below.
-- [ ] Run API/configuration tests and the full suite.
+- [x] Write failing tests for valid signed ingestion, tampering, stale timestamps, invalid schema/IDs, body limits, duplicate conflict, and admin auth.
+- [x] Run tests and observe missing behavior; implement the smallest complete API against the storage contract below.
+- [x] Run API/configuration tests and the full suite.
 
 ## Task 2: Durable delivery (delegated worker)
 
@@ -41,19 +41,19 @@ Files: `src/relayqueue/storage.py`, `worker.py`, `tests/test_delivery.py`.
 
 Interfaces: `Database(url)`, `ensure_schema()`, `ingest(event_id, topic, body: bytes, now: float) -> tuple[dict, bool]`, `get_event(event_id) -> dict | None`, `list_events(status=None, limit=50) -> list[dict]`, `metrics() -> dict`, `close()`; `ConflictError`; `process_one(database, settings, *, client=None, now=None) -> bool`. Dictionary snapshots include `id`, `topic`, `status`, `attempt_count`, `last_error`, timestamps and attempt history; exclude raw payload. Settings fields are recorded in the worker brief.
 
-- [ ] Write and run failing tests for persistence, ingestion deduplication/conflicts, retries/exhaustion, permanent errors, lease races/recovery/fencing, crash budgets, and outbound signatures.
-- [ ] Implement transactional storage and delivery; confirm every claimed attempt is recorded and bounded.
-- [ ] Run tests with SQLite, then reuse the suite with PostgreSQL in CI.
+- [x] Write and run failing tests for persistence, ingestion deduplication/conflicts, retries/exhaustion, permanent errors, lease races/recovery/fencing, crash budgets, and outbound signatures.
+- [x] Implement transactional storage and delivery; confirm every claimed attempt is recorded and bounded.
+- [x] Run tests with SQLite, then reuse the suite with PostgreSQL in CI.
 
 ## Task 3: Demonstration and delivery (primary agent)
 
 Files: `scripts/demo.py`, `README.md`, `docs/interview.md`, `docs/validation.md`, `.github/workflows/ci.yml`, `Dockerfile`, `compose.yaml`, `.env.example`, `requirements.lock`.
 
-- [ ] Add a synthetic loopback HTTP demo showing invalid signature rejection, duplicates, 503-to-success recovery, and dead-letter exhaustion.
-- [ ] Run full tests, lint, format checks, package build, locked clean install and demo; record actual evidence.
-- [ ] Obtain independent review, fix material findings with regression tests, and rerun affected checks.
-- [ ] Create/push the new public repository; verify remote SHA and GitHub CI, including PostgreSQL and container demo.
-- [ ] Update the weekly ledger and deliver repository, verified resume drafts and exercise.
+- [x] Add a synthetic loopback HTTP demo showing invalid signature rejection, duplicates, 503-to-success recovery, and dead-letter exhaustion.
+- [x] Run full tests, lint, format checks, package build, locked clean install and demo; record actual evidence.
+- [x] Obtain independent review, fix material findings with regression tests, and rerun affected checks.
+- [x] Create/push the new public repository; verify remote SHA and GitHub CI, including PostgreSQL and container demo.
+- [x] Update the weekly ledger and deliver repository, verified resume drafts and exercise.
 
 ## Execution decisions
 
