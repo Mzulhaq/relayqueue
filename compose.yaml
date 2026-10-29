@@ -1,0 +1,60 @@
+x-app: &app
+  build: .
+  environment: &environment
+    RQ_DATABASE_URL: postgresql+psycopg://relayqueue:local-demo-only@db:5432/relayqueue
+    RQ_INGRESS_SECRET: ${RQ_INGRESS_SECRET:?Set RQ_INGRESS_SECRET in .env}
+    RQ_DESTINATION_SECRET: ${RQ_DESTINATION_SECRET:?Set RQ_DESTINATION_SECRET in .env}
+    RQ_ADMIN_TOKEN: ${RQ_ADMIN_TOKEN:?Set RQ_ADMIN_TOKEN in .env}
+    RQ_DESTINATION_URL: ${RQ_DESTINATION_URL:?Set RQ_DESTINATION_URL in .env}
+    RQ_ALLOW_INSECURE_HTTP: ${RQ_ALLOW_INSECURE_HTTP:-false}
+    RQ_MAX_ATTEMPTS: ${RQ_MAX_ATTEMPTS:-5}
+    RQ_RETRY_BASE_SECONDS: ${RQ_RETRY_BASE_SECONDS:-2}
+    RQ_RETRY_MAX_SECONDS: ${RQ_RETRY_MAX_SECONDS:-60}
+    RQ_REQUEST_TIMEOUT_SECONDS: ${RQ_REQUEST_TIMEOUT_SECONDS:-5}
+    RQ_LEASE_SECONDS: ${RQ_LEASE_SECONDS:-30}
+    RQ_POLL_INTERVAL_SECONDS: ${RQ_POLL_INTERVAL_SECONDS:-0.5}
+    RQ_MAX_BODY_BYTES: ${RQ_MAX_BODY_BYTES:-65536}
+    RQ_SIGNATURE_TOLERANCE_SECONDS: ${RQ_SIGNATURE_TOLERANCE_SECONDS:-300}
+  init: true
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: relayqueue
+      POSTGRES_PASSWORD: local-demo-only
+      POSTGRES_DB: relayqueue
+    volumes:
+      - queue-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U relayqueue -d relayqueue"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+  initialize:
+    <<: *app
+    command: ["python", "-c", "from relayqueue.config import Settings; from relayqueue.storage import Database; db=Database(Settings.from_env().database_url); db.ensure_schema(); db.close()"]
+    depends_on:
+      db:
+        condition: service_healthy
+  api:
+    <<: *app
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      initialize:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/ready', timeout=2)"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+  worker:
+    <<: *app
+    command: ["relayqueue-worker"]
+    depends_on:
+      initialize:
+        condition: service_completed_successfully
+
+volumes:
+  queue-data:
